@@ -7,8 +7,15 @@
         "guzzlehttp/guzzle": "^6.3",
         "psr/log": "^1.1"
     },
+    "keywords": ["chat", "corax", "service", "im", "http"],
+    "homepage": "http://corax.ir",
     "license": "MIT",
     "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Corax\\": "/"
+        }
+    },
     "authors": [
         {
             "name": "Arash Rasoulzadeh",
