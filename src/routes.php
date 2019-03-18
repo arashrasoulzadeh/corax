@@ -1,4 +1,7 @@
 <?php
 Route::get('greeting', function () {
-    return 'Hi, this is your awesome package!';
+    return 'koosisher tavoni?';
 });
+
+Route::get('corax','arashrasoulzadeh\corax\Controllers\CoraxController@hello');
+Route::get('corax/http/listen','arashrasoulzadeh\corax\Controllers\CoraxController@listen');
