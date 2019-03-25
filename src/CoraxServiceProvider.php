@@ -2,6 +2,8 @@
 
 namespace arashrasoulzadeh\corax;
 
+use arashrasoulzadeh\corax\devices\RedisCacheDevice;
+use arashrasoulzadeh\corax\devices\RedisStorageDevice;
 use arashrasoulzadeh\corax\Events\SendMessageEvent;
 use arashrasoulzadeh\corax\Listeners\ReceiveMessageListener;
 use arashrasoulzadeh\corax\Listeners\SendMessageListener;
@@ -22,7 +24,11 @@ class CoraxServiceProvider extends ServiceProvider
     {
         //load Corax singleton
         $this->app->singleton(Corax::class, function ($app) {
-            return new Corax(config('app.corax.type', Corax::$CORAX_TYPE_HTTP));
+            return new Corax(
+                config('app.corax.type', Corax::$CORAX_TYPE_HTTP),
+                config('app.corax.storage', RedisStorageDevice::class),
+                config('app.corax.cache', RedisCacheDevice::class)
+            );
         });
 
 

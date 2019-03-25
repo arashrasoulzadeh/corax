@@ -5,8 +5,12 @@ namespace arashrasoulzadeh\corax\Controllers;
 
 use arashrasoulzadeh\corax\services\Corax;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Redis;
 
+/**
+ * sample controller
+ * Class CoraxController
+ * @package arashrasoulzadeh\corax\Controllers
+ */
 class CoraxController extends Controller
 {
     //
@@ -19,12 +23,16 @@ class CoraxController extends Controller
 
     public function hello()
     {
+//
+//            Corax::builder()->sendMessage(
+//                2,
+//                1,
+//                Corax::builder()->makePayload(
+//                    "how are you ?"
+//                ));
 
-        Corax::builder()->sendMessage(
-            1,
-            2,
-            Corax::builder()->makePayload(
-                "hello there"
-            ));
+
+        $conv = Corax::builder()->getConversation(1, 2);
+        return $conv;
     }
 }

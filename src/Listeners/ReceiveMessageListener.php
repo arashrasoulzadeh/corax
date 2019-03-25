@@ -24,6 +24,6 @@ class ReceiveMessageListener implements ShouldQueue
      */
     public function handle($event)
     {
-        dump("default:receive");
+
     }
 }
