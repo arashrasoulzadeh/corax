@@ -11,7 +11,6 @@ namespace arashrasoulzadeh\corax\devices;
 
 use arashrasoulzadeh\corax\interfaces\CacheInterface;
 use arashrasoulzadeh\corax\interfaces\StorageInterface;
-use arashrasoulzadeh\corax\services\Corax;
 use Illuminate\Support\Facades\Redis;
 
 class RedisCacheDevice implements CacheInterface
@@ -24,7 +23,22 @@ class RedisCacheDevice implements CacheInterface
      */
     public function isChanged($key): bool
     {
+        $key = "CHANGED?" . $this->getKey($key);
+        $key = Redis::get($key);
+        if (empty($key)) {
+            return true;
+        }
         return false;
+    }
+
+    /**
+     * returns the key used for identifying
+     * @param $args
+     * @return mixed
+     */
+    public function getKey($args)
+    {
+        return "CACHE" . $args;
     }
 
     /**
@@ -34,8 +48,7 @@ class RedisCacheDevice implements CacheInterface
      */
     public function getCached($key)
     {
-        $key = "CACHE" . $key;
-        return Redis::get($key);
+        return Redis::get($this->getKey($key));
     }
 
     /**
@@ -45,6 +58,19 @@ class RedisCacheDevice implements CacheInterface
      */
     public function setChanges($key, $newValue)
     {
+        Redis::set("CHANGED?" . $this->getKey($key),now());
+        return Redis::set($this->getKey($key), $newValue);
+    }
 
+
+    /**
+     * delete the key from cache
+     * @param $key
+     * @return mixed
+     */
+    public function delete($key)
+    {
+
+        Redis::set("CHANGED?" . $this->getKey($key), null);
     }
 }

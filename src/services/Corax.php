@@ -11,6 +11,7 @@ namespace arashrasoulzadeh\corax\services;
 use arashrasoulzadeh\corax\CoraxSerializer;
 use arashrasoulzadeh\corax\devices\HttpTransferDevice;
 use arashrasoulzadeh\corax\interfaces\CacheInterface;
+use arashrasoulzadeh\corax\interfaces\SerializerInterface;
 use arashrasoulzadeh\corax\interfaces\StorageInterface;
 use Illuminate\Support\Facades\App;
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,7 @@ class Corax
     public $type = 0;
     private $logger;
     private $cache;
+    private $serializer;
     private $storage = StorageInterface::class;
     private $transportDevice = null;
 
@@ -34,15 +36,21 @@ class Corax
      * @param $cache
      * @param LoggerInterface|null $logger
      */
-    public function __construct($type, $storage, $cache, LoggerInterface $logger = null)
+    public function __construct($type, $storage, $cache, $serializer, LoggerInterface $logger = null)
     {
         $this->type = $type;
+        $this->serializer = new $serializer;
         $this->logger = $logger;
         $this->cache = new $cache;
         $this->transportDevice = new HttpTransferDevice();
         $this->storage = $storage;
     }
 
+
+    public function getSerializer(): SerializerInterface
+    {
+        return $this->serializer;
+    }
 
     /**
      * builder class
@@ -68,7 +76,7 @@ class Corax
     public function getStorageDevice(): StorageInterface
     {
         if (is_string($this->storage))
-            $this->storage = new $this->storage(1,2,$this->cache);
+            $this->storage = new $this->storage(1, 2, $this->cache);
         return $this->storage;
     }
 
@@ -77,7 +85,8 @@ class Corax
     {
 //        $this->getCacheDevice()->setChanges($payload->id, $payload);
         event('corax.sendmessage',
-            CoraxSerializer::serialize(["from" => $from, "to" => $to, "payload" => $payload])
+
+            Corax::builder()->getSerializer()->serialize(["from" => $from, "to" => $to, "payload" => $payload])
         );
         $this->log("message sent");
     }

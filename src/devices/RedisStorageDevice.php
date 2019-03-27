@@ -9,10 +9,10 @@
 namespace arashrasoulzadeh\corax\devices;
 
 
-use arashrasoulzadeh\corax\CoraxSerializer;
 use arashrasoulzadeh\corax\exceptions\ConversationIsNotArrayException;
 use arashrasoulzadeh\corax\interfaces\CacheInterface;
 use arashrasoulzadeh\corax\interfaces\StorageInterface;
+use arashrasoulzadeh\corax\services\Corax;
 use Illuminate\Support\Facades\Redis;
 
 class RedisStorageDevice implements StorageInterface
@@ -38,14 +38,20 @@ class RedisStorageDevice implements StorageInterface
 
     public function injectId($message): string
     {
-        $obj = CoraxSerializer::deserialize($message);
+        $obj = Corax::builder()->getSerializer()->deserialize($message);
         $obj->id = $this->getCounter();
-        return CoraxSerializer::serialize($obj);
+        return Corax::builder()->getSerializer()->serialize($obj);
     }
 
     public function set($message)
     {
-        return Redis::rpush($this->key, $this->injectId($message));
+        $this->getCache()->delete($this->key);
+        $message = $this->injectId($message);
+        $id = Corax::builder()->getSerializer()->deserialize($message)->id;
+        $result = Redis::rpush($this->key, $message);
+        $conversation = Corax::builder()->getSerializer()->serialize($this->conversation());
+        Corax::builder()->getCacheDevice()->setChanges($this->key, $conversation);
+        return $result;
     }
 
     public function get($id)
@@ -62,10 +68,21 @@ class RedisStorageDevice implements StorageInterface
 
     public function deserializeConversation($data)
     {
-        if (!is_array($data))
-            throw new ConversationIsNotArrayException();
+        try {
+            if (is_string($data))
+                throw new ConversationIsNotArrayException();
+        } catch (ConversationIsNotArrayException $e) {
+            throw new ConversationIsNotArrayException("saved conversation is not an array!");
+        }
         return array_map(function ($item) {
-            return CoraxSerializer::deserialize($item);
+            if (is_object($item))
+                return $item;
+            if (is_string($item))
+                return Corax::builder()->getSerializer()->deserialize(
+                    $item
+                );
+            else
+                return [];
         }, $data);
     }
 
@@ -74,8 +91,12 @@ class RedisStorageDevice implements StorageInterface
         $data = [];
         if ($this->getCache()->isChanged($this->key)) {
             $data = Redis::lrange($this->key, 0, -1);
+            $this->getCache()->setChanges(
+                $this->key,
+                Corax::builder()->getSerializer()->serialize($data)
+            );
         } else {
-            $data = $this->getCache()->getCached($this->key);
+            $data = Corax::builder()->getSerializer()->deserialize($this->getCache()->getCached($this->key));
         }
 
         return $this->deserializeConversation($data);

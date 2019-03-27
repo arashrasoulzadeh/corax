@@ -22,6 +22,12 @@ interface CacheInterface
     public function isChanged($key): bool;
 
     /**
+     * returns the key used for identifying
+     * @param $args
+     * @return mixed
+     */
+    public function getKey($args);
+    /**
      * returns the cached value
      * @param $key
      * @return StorageInterface
@@ -34,4 +40,11 @@ interface CacheInterface
      * @param $newValue
      */
     public function setChanges($key, $newValue);
+
+    /**
+     * delete the key from cache
+     * @param $key
+     * @return mixed
+     */
+    public function delete($key);
 }

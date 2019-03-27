@@ -8,20 +8,31 @@
 
 namespace arashrasoulzadeh\corax;
 
+use arashrasoulzadeh\corax\interfaces\SerializerInterface;
+
 /**
  * de/serializer class for corax
  * Class CoraxSerializer
  * @package arashrasoulzadeh\corax
  */
-class CoraxSerializer
+class CoraxSerializer implements SerializerInterface
 {
-    public static function serialize($object): string
+
+    /**
+     * serialize the input
+     * @return mixed
+     */
+    public function serialize($input)
     {
-        return json_encode($object);
+        return json_encode($input);
     }
 
-    public static function deserialize($string): object
+    /**
+     * deserialize the input
+     * @return mixed
+     */
+    public function deserialize($input)
     {
-        return json_decode($string);
+        return json_decode($input);
     }
 }

@@ -23,13 +23,13 @@ class CoraxController extends Controller
 
     public function hello()
     {
-//
-//            Corax::builder()->sendMessage(
-//                2,
-//                1,
-//                Corax::builder()->makePayload(
-//                    "how are you ?"
-//                ));
+
+            Corax::builder()->sendMessage(
+                2,
+                1,
+                Corax::builder()->makePayload(
+                    "how are you ?"
+                ));
 
 
         $conv = Corax::builder()->getConversation(1, 2);

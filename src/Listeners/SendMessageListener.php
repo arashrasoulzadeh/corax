@@ -2,7 +2,6 @@
 
 namespace arashrasoulzadeh\corax\Listeners;
 
-use arashrasoulzadeh\corax\CoraxSerializer;
 use arashrasoulzadeh\corax\services\Corax;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -28,7 +27,7 @@ class SendMessageListener implements ShouldQueue
      */
     public function handle($event)
     {
-        $event_deserialized = CoraxSerializer::deserialize($event);
-        (new $this->storage(1, 2))->set($event);
+        $event_deserialized = Corax::builder()->getSerializer()->deserialize($event);
+        (new $this->storage(1, 2,Corax::builder()->getCacheDevice()))->set($event);
     }
 }

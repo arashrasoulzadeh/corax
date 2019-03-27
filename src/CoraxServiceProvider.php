@@ -27,7 +27,8 @@ class CoraxServiceProvider extends ServiceProvider
             return new Corax(
                 config('app.corax.type', Corax::$CORAX_TYPE_HTTP),
                 config('app.corax.storage', RedisStorageDevice::class),
-                config('app.corax.cache', RedisCacheDevice::class)
+                config('app.corax.cache', RedisCacheDevice::class),
+                config('app.corax.serializer', CoraxSerializer::class)
             );
         });
 
